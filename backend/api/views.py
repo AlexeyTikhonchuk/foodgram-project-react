@@ -1,22 +1,24 @@
 from io import StringIO
 
+from django.contrib.auth.hashers import check_password
 from django.db.models import Sum
 from django.http import HttpResponse
-from django.contrib.auth.hashers import check_password
 from django.shortcuts import get_object_or_404
 from rest_framework import mixins, permissions, status, viewsets
 from rest_framework.decorators import action
 from rest_framework.response import Response
+
+from recipes.models import (AmountIngredient, FavoriteRecipe, Ingredient,
+                            Recipe, ShoppingList, Tag)
 from users.models import Follow, User
-from recipes.models import (AmountIngredient, FavoriteRecipe, Ingredient, Recipe,
-                         ShoppingList, Tag)
+
+from .filters import IngredientSearchFilterBackend, RecipeFilterBackend
 from .permissions import RecipePermission
-from .serializers import (FollowSerializer, RecipeSerializer,
-                          IngredientSerializer, PasswordSerializer,
-                          CreateAndUpdateRecipeSerializer, ShortRecipeSerializer,
-                          TagSerializer, UserSerializer)
+from .serializers import (CreateAndUpdateRecipeSerializer,
+                          CreatePasswordSerializer, FollowSerializer,
+                          IngredientSerializer, RecipeSerializer,
+                          ShortRecipeSerializer, TagSerializer, UserSerializer)
 from .utils import PageLimitPaginator, delete_old_ingredients
-from .filters import IngredientSearchFilterBackend,  RecipeFilterBackend
 
 
 class UserViewSet(
@@ -44,7 +46,7 @@ class UserViewSet(
         permission_classes=(permissions.IsAuthenticated,)
     )
     def set_password(self, request):
-        serializer = PasswordSerializer(data=request.data)
+        serializer = CreatePasswordSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         password = serializer.validated_data['current_password']
         new_password = serializer.validated_data['new_password']
@@ -155,15 +157,15 @@ class RecipeViewSet(viewsets.ModelViewSet):
         )
         shopping_cart_file = StringIO()
         for position in shopping_list:
-            position_ingredient = get_object_or_404(
+            ingredient = get_object_or_404(
                 Ingredient,
                 pk=position['ingredient']
             )
-            position_amount = position['total_amount']
+            amount = position['total_amount']
             shopping_cart_file.write(
-                f' *  {position_ingredient.name.title()}'
-                f' ({position_ingredient.measurement_unit})'
-                f' - {position_amount}' + '\n'
+                f' - {ingredient.name.title()}'
+                f' ({ingredient.measurement_unit})'
+                f' - {amount}' + '\n'
             )
         response = HttpResponse(
             shopping_cart_file.getvalue(),
@@ -175,14 +177,16 @@ class RecipeViewSet(viewsets.ModelViewSet):
         return response
 
 
-class CustomCreateAndDeleteMixin:
-    def custom_create(self, request, id, attribute, model):
+class ShoppingCartViewSet(viewsets.ViewSet):
+    permission_classes = (permissions.IsAuthenticated,)
+
+    def create(self, request, id):
         recipe = get_object_or_404(Recipe, pk=id)
-        queryset = getattr(recipe, attribute)
+        queryset = getattr(recipe, 'shopping_list_recipes')
         if not queryset.filter(
             user=request.user
         ).exists():
-            model.objects.create(
+            ShoppingList.objects.create(
                 user=request.user,
                 recipe=recipe
             )
@@ -192,9 +196,9 @@ class CustomCreateAndDeleteMixin:
             return Response(serializer.data, status.HTTP_201_CREATED)
         return Response(status=status.HTTP_400_BAD_REQUEST)
 
-    def custom_destroy(self, request, id, attribute):
+    def destroy(self, request, id):
         recipe = get_object_or_404(Recipe, pk=id)
-        queryset = getattr(recipe, attribute)
+        queryset = getattr(recipe, 'shopping_list_recipes')
         data = (
             queryset.filter(
                 user=request.user
@@ -206,28 +210,34 @@ class CustomCreateAndDeleteMixin:
         return Response(status=status.HTTP_400_BAD_REQUEST)
 
 
-class ShoppingCartViewSet(viewsets.ViewSet, CustomCreateAndDeleteMixin):
+class FavoriteViewSet(viewsets.ViewSet):
     permission_classes = (permissions.IsAuthenticated,)
 
     def create(self, request, id):
-        attribute = 'shopping_list_recipes'
-        model = ShoppingList
-        return self.custom_create(request, id, attribute, model)
+        recipe = get_object_or_404(Recipe, pk=id)
+        queryset = getattr(recipe, 'favorite_recipes')
+        if not queryset.filter(
+            user=request.user
+        ).exists():
+            FavoriteRecipe.objects.create(
+                user=request.user,
+                recipe=recipe
+            )
+            serializer = ShortRecipeSerializer(
+                recipe, context={'request': request}
+            )
+            return Response(serializer.data, status.HTTP_201_CREATED)
+        return Response(status=status.HTTP_400_BAD_REQUEST)
 
     def destroy(self, request, id):
-        attribute = 'shopping_list_recipes'
-        return self.custom_destroy(request, id, attribute)
-
-
-class FavoriteViewSet(viewsets.ViewSet, CustomCreateAndDeleteMixin):
-    permission_classes = (permissions.IsAuthenticated,)
-
-    def create(self, request, id):
-        attribute = 'favorite_recipes'
-        model = FavoriteRecipe
-        return self.custom_create(request, id, attribute, model)
-
-    def destroy(self, request, id):
-        attribute = 'favorite_recipes'
-        return self.custom_destroy(request, id, attribute)
-
+        recipe = get_object_or_404(Recipe, pk=id)
+        queryset = getattr(recipe, 'favorite_recipes')
+        data = (
+            queryset.filter(
+                user=request.user
+            )
+        )
+        if data.exists():
+            data.delete()
+            return Response(status=status.HTTP_204_NO_CONTENT)
+        return Response(status=status.HTTP_400_BAD_REQUEST)

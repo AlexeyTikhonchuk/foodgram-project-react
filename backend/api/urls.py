@@ -14,10 +14,14 @@ router_api.register('tags', TagViewSet)
 router_api.register('ingredients', IngredientViewSet)
 router_api.register('recipes', RecipeViewSet)
 
+djoser = [
+    path('', include('djoser.urls')),
+    path('', include('djoser.urls.authtoken'))
+]
+
 urlpatterns = [
-    path('auth/', include('djoser.urls')),
-    path('auth/', include('djoser.urls.authtoken')),
     path('', include(router_api.urls)),
+    path('auth/', include(djoser)),
     path('users/<int:user_id>/subscribe/', FollowViewSet.as_view({
         'post': 'create',
         'delete': 'destroy'

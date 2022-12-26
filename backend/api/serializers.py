@@ -1,9 +1,10 @@
 from django.shortcuts import get_object_or_404
-from rest_framework import serializers
 from drf_extra_fields.fields import Base64ImageField
+from rest_framework import serializers
 
-from users.models import User
 from recipes.models import AmountIngredient, Ingredient, Recipe, Tag
+from users.models import User
+
 from .utils import delete_old_ingredients
 
 
@@ -36,7 +37,7 @@ class UserSerializer(serializers.ModelSerializer):
         return data
 
 
-class PasswordSerializer(serializers.Serializer):
+class CreatePasswordSerializer(serializers.Serializer):
     new_password = serializers.CharField(max_length=150)
     current_password = serializers.CharField(max_length=150)
 
@@ -70,13 +71,6 @@ class FollowSerializer(UserSerializer):
         return obj.recipes.count()
 
 
-class ShortRecipeSerializer(serializers.ModelSerializer):
-
-    class Meta:
-        model = Recipe
-        fields = ('id', 'name', 'image', 'cooking_time')
-
-
 class TagSerializer(serializers.ModelSerializer):
 
     class Meta:
@@ -91,6 +85,14 @@ class IngredientSerializer(serializers.ModelSerializer):
         fields = ('id', 'name', 'measurement_unit')
 
 
+class AmountIngredientSerializer(serializers.ModelSerializer):
+    id = serializers.IntegerField()
+
+    class Meta:
+        model = AmountIngredient
+        fields = ('id', 'amount')
+
+
 class FullAmountIngredientSerializer(serializers.ModelSerializer):
     id = serializers.IntegerField(source='ingredient.id')
     name = serializers.CharField(source='ingredient.name')
@@ -103,12 +105,11 @@ class FullAmountIngredientSerializer(serializers.ModelSerializer):
         fields = ('id', 'name', 'measurement_unit', 'amount')
 
 
-class AmountIngredientSerializer(serializers.ModelSerializer):
-    id = serializers.IntegerField()
+class ShortRecipeSerializer(serializers.ModelSerializer):
 
     class Meta:
-        model = AmountIngredient
-        fields = ('id', 'amount')
+        model = Recipe
+        fields = ('id', 'name', 'image', 'cooking_time')
 
 
 class RecipeSerializer(serializers.ModelSerializer):

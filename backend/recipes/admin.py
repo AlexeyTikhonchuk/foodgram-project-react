@@ -3,11 +3,6 @@ from django.contrib import admin
 from .models import (AmountIngredient, FavoriteRecipe, Ingredient, Recipe,
                      ShoppingList, Tag)
 
-from django.contrib import admin
-
-from .models import (AmountIngredient, FavoriteRecipe, Ingredient, Recipe,
-                     ShoppingList, Tag)
-
 
 class RecipeAdmin(admin.ModelAdmin):
     readonly_fields = ('добавлен_в_избранное',)
