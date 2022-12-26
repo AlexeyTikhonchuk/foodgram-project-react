@@ -59,18 +59,18 @@ class FollowSerializer(UserSerializer):
         recipes = obj.recipes.all()
         if recipes_limit is not None:
             recipes_limit = int(recipes_limit)
-            serializer = SmallRecipeSerializer(
+            serializer = ShortRecipeSerializer(
                 recipes[:recipes_limit], many=True
             )
         else:
-            serializer = SmallRecipeSerializer(recipes, many=True)
+            serializer = ShortRecipeSerializer(recipes, many=True)
         return serializer.data
 
     def get_recipes_count(self, obj):
         return obj.recipes.count()
 
 
-class SmallRecipeSerializer(serializers.ModelSerializer):
+class ShortRecipeSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Recipe
@@ -111,7 +111,7 @@ class AmountIngredientSerializer(serializers.ModelSerializer):
         fields = ('id', 'amount')
 
 
-class FullRecipeSerializer(serializers.ModelSerializer):
+class RecipeSerializer(serializers.ModelSerializer):
     is_favorited = serializers.SerializerMethodField()
     is_in_shopping_cart = serializers.SerializerMethodField()
     image = Base64ImageField()
@@ -148,7 +148,7 @@ class FullRecipeSerializer(serializers.ModelSerializer):
         return False
 
 
-class RecordRecipeSerializer(FullRecipeSerializer):
+class CreateAndUpdateRecipeSerializer(RecipeSerializer):
     tags = serializers.PrimaryKeyRelatedField(
         many=True,
         queryset=Tag.objects.all()

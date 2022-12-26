@@ -11,9 +11,9 @@ from users.models import Follow, User
 from recipes.models import (AmountIngredient, FavoriteRecipe, Ingredient, Recipe,
                          ShoppingList, Tag)
 from .permissions import RecipePermission
-from .serializers import (FollowSerializer, FullRecipeSerializer,
+from .serializers import (FollowSerializer, RecipeSerializer,
                           IngredientSerializer, PasswordSerializer,
-                          RecordRecipeSerializer, SmallRecipeSerializer,
+                          CreateAndUpdateRecipeSerializer, ShortRecipeSerializer,
                           TagSerializer, UserSerializer)
 from .utils import PageLimitPaginator, delete_old_ingredients
 from .filters import IngredientSearchFilterBackend,  RecipeFilterBackend
@@ -125,15 +125,15 @@ class IngredientViewSet(TagViewSet):
 
 class RecipeViewSet(viewsets.ModelViewSet):
     queryset = Recipe.objects.all()
-    serializer_class = FullRecipeSerializer
+    serializer_class = RecipeSerializer
     pagination_class = PageLimitPaginator
     permission_classes = (RecipePermission,)
     filter_backends = (RecipeFilterBackend,)
 
     def get_serializer_class(self):
         if self.action == 'create' or self.action == 'partial_update':
-            return RecordRecipeSerializer
-        return FullRecipeSerializer
+            return CreateAndUpdateRecipeSerializer
+        return RecipeSerializer
 
     def destroy(self, request, *args, **kwargs):
         instance = self.get_object()
@@ -186,7 +186,7 @@ class CustomCreateAndDeleteMixin:
                 user=request.user,
                 recipe=recipe
             )
-            serializer = SmallRecipeSerializer(
+            serializer = ShortRecipeSerializer(
                 recipe, context={'request': request}
             )
             return Response(serializer.data, status.HTTP_201_CREATED)
