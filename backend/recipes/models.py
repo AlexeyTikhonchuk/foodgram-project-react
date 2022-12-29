@@ -109,7 +109,7 @@ class FavoriteRecipe(models.Model):
         ]
 
     def __str__(self):
-        return self.user.username
+        return self.user
 
 
 class ShoppingList(models.Model):
