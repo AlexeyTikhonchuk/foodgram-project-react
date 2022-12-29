@@ -17,16 +17,16 @@ class CustomUser(AbstractUser):
         max_length=150,
         verbose_name='Фамилия'
     )
+    USERNAME_FIELD = 'email'
+    REQUIRED_FIELDS = ['username']
 
     class Meta:
         verbose_name = "Пользователь"
         verbose_name_plural = "Пользователи"
 
     def __str__(self):
-        return self.username
+        return f"{self.first_name} {self.last_name}"
 
-
-User = get_user_model()
 
 User = get_user_model()
 
@@ -57,4 +57,4 @@ class Follow(models.Model):
         ]
 
     def __str__(self):
-        return self.user.username
+        return f'Подписчик: {self.user}, автор: {self.author}'
