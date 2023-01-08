@@ -31,22 +31,27 @@ jobs:
     steps:
       - name: Check out the repo
         uses: actions/checkout@v3
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v1
+
+      - name: Login to Docker
+        uses: docker/login-action@v1
+        with:
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_PASSWORD }}
       - name: Push backend image to Docker Hub
         uses: docker/build-push-action@v2
         with:
-          username: ${{ secrets.DOCKER_USERNAME }}
-          password: ${{ secrets.DOCKER_PASSWORD }}
-          repository: ${{ secrets.DOCKER_USERNAME }}/foodgram_backend
+          push: true
+          tags: ${{ secrets.DOCKER_USERNAME }}/foodgram_backend
           file: backend/Dockerfile
-          tag_with_ref: true
       - name: Push frontend image to Docker Hub
         uses: docker/build-push-action@v2
         with:
-          username: ${{ secrets.DOCKER_USERNAME }}
-          password: ${{ secrets.DOCKER_PASSWORD }}
-          repository: ${{ secrets.DOCKER_USERNAME }}/foodgram_frontend
+          push: true
+          tags: ${{ secrets.DOCKER_USERNAME }}/foodgram_frontend
           file: frontend/Dockerfile
-          tag_with_ref: true
   deploy:
     name: Deploy on server
     runs-on: ubuntu-latest
