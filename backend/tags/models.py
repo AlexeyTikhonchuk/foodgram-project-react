@@ -10,7 +10,8 @@ class Tag(models.Model):
     )
     color = ColorField(
         verbose_name='Цвет HEX',
-        unique=True)
+        unique=True
+    )
     slug = models.SlugField(
         unique=True,
         verbose_name='Слаг тега'

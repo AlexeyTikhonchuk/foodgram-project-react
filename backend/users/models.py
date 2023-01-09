@@ -1,4 +1,3 @@
-from django.contrib.auth import get_user_model
 from django.contrib.auth.models import AbstractUser
 from django.db import models
 
@@ -17,8 +16,9 @@ class CustomUser(AbstractUser):
         max_length=150,
         verbose_name='Фамилия'
     )
+
     USERNAME_FIELD = 'email'
-    REQUIRED_FIELDS = ['username']
+    REQUIRED_FIELDS = ['username', 'first_name', 'last_name']
 
     class Meta:
         verbose_name = "Пользователь"
@@ -28,18 +28,15 @@ class CustomUser(AbstractUser):
         return f"{self.first_name} {self.last_name}"
 
 
-User = get_user_model()
-
-
 class Follow(models.Model):
     user = models.ForeignKey(
-        User,
+        CustomUser,
         on_delete=models.CASCADE,
         related_name='follower',
         verbose_name='Подписчик'
     )
     author = models.ForeignKey(
-        User,
+        CustomUser,
         on_delete=models.CASCADE,
         related_name='following',
         verbose_name='Автор'
