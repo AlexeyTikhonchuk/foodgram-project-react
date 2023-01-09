@@ -1,4 +1,5 @@
 from django.contrib.auth import get_user_model
+from django.core.validators import MinValueValidator
 from django.db import models
 
 from ingredients.models import Ingredient
@@ -37,6 +38,7 @@ class Recipe(models.Model):
         verbose_name='Тэги рецепта'
     )
     cooking_time = models.PositiveIntegerField(
+        validators=(MinValueValidator(1),),
         verbose_name='Время приготовления рецепта'
     )
     pub_date = models.DateTimeField(
@@ -60,6 +62,7 @@ class AmountIngredient(models.Model):
         on_delete=models.CASCADE
     )
     amount = models.PositiveIntegerField(
+        validators=(MinValueValidator(1),),
         verbose_name='Количество ингредиента'
     )
     recipe = models.ForeignKey(

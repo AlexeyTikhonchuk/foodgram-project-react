@@ -1,3 +1,4 @@
+from django.core.validators import MinValueValidator
 from django.shortcuts import get_object_or_404
 from drf_extra_fields.fields import Base64ImageField
 from rest_framework import exceptions, serializers
@@ -12,6 +13,14 @@ from ..users.serializers import CustomUserSerializer
 
 class AmountIngredientSerializer(serializers.ModelSerializer):
     id = serializers.IntegerField()
+    amount = serializers.IntegerField(
+        validators=(
+            MinValueValidator(
+                1,
+                message='Количество ингредиента должно быть не менее 1.'
+            ),
+        )
+    )
 
     class Meta:
         model = AmountIngredient
@@ -78,6 +87,14 @@ class CreateAndUpdateRecipeSerializer(RecipeSerializer):
         queryset=Tag.objects.all()
     )
     ingredients = AmountIngredientSerializer(many=True)
+    cooking_time = serializers.IntegerField(
+        validators=(
+            MinValueValidator(
+                1,
+                message='Время приготовления должно быть не менее 1.'
+            ),
+        )
+    )
 
     class Meta:
         model = Recipe
