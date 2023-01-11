@@ -2,7 +2,6 @@ from django.contrib.auth import get_user_model
 from djoser.serializers import UserCreateSerializer, UserSerializer
 from rest_framework import serializers
 
-
 from recipes.models import Recipe
 from users.models import Follow
 
@@ -10,7 +9,6 @@ User = get_user_model()
 
 
 class CustomCreateUserSerializer(UserCreateSerializer):
-
     class Meta:
         model = User
         fields = ('id', 'username', 'first_name', 'last_name', 'email',
@@ -35,13 +33,7 @@ class CustomUserSerializer(UserSerializer):
         return False
 
 
-class FollowSerializer(serializers.ModelSerializer):
-    id = serializers.ReadOnlyField(source='author.id')
-    email = serializers.ReadOnlyField(source='author.email')
-    username = serializers.ReadOnlyField(source='author.username')
-    first_name = serializers.ReadOnlyField(source='author.first_name')
-    last_name = serializers.ReadOnlyField(source='author.last_name')
-    is_subscribed = serializers.SerializerMethodField()
+class FollowSerializer(CustomUserSerializer):
     recipes = serializers.SerializerMethodField()
     recipes_count = serializers.SerializerMethodField()
 
@@ -49,12 +41,6 @@ class FollowSerializer(serializers.ModelSerializer):
         model = Follow
         fields = ('id', 'username', 'first_name', 'last_name', 'email',
                   'is_subscribed', 'recipes', 'recipes_count')
-
-    def get_is_subscribed(self, obj):
-        user = self.context.get('request').user
-        if user.is_anonymous:
-            return False
-        return Follow.objects.filter(user=user, author=obj.author).exists()
 
     def get_recipes(self, obj):
         request = self.context.get('request')
@@ -69,7 +55,6 @@ class FollowSerializer(serializers.ModelSerializer):
 
 
 class ShortRecipeSerializer(serializers.ModelSerializer):
-
     class Meta:
         model = Recipe
         fields = ('id', 'name', 'image', 'cooking_time')

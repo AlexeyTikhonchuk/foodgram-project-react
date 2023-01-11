@@ -1,7 +1,6 @@
 from rest_framework import viewsets
 
 from tags.models import Tag
-
 from .serializers import TagSerializer
 
 
