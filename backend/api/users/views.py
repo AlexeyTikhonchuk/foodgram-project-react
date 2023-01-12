@@ -5,6 +5,7 @@ from rest_framework import permissions, status
 from rest_framework.decorators import action
 from rest_framework.response import Response
 
+from users.models import Follow
 from ..utils.paginators import PageLimitPaginator
 from .serializers import FollowSerializer
 
