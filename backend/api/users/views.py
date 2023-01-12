@@ -17,10 +17,10 @@ class CustomUserViewSet(UserViewSet):
 
     @action(detail=False, permission_classes=[permissions.IsAuthenticated])
     def subscriptions(self, request):
-        queryset = User.objects.filter(follower=request.user)
+        queryset = User.objects.filter(following__user=request.user)
         page = self.paginate_queryset(queryset)
-        serializer = CustomUserSerializer(page, many=True,
-                                          context={'request': request})
+        serializer = FollowSerializer(page, many=True,
+                                      context={'request': request})
         return self.get_paginated_response(serializer.data)
 
     @action(detail=True,
