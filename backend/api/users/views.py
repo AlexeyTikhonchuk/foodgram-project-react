@@ -37,8 +37,8 @@ class CustomUserViewSet(UserViewSet):
             return Response({'errors':
                             'Вы уже подписались на этого автора.'},
                             status=status.HTTP_400_BAD_REQUEST)
-        queryset = Follow.objects.create(user=user, author=author)
-        serializer = FollowSerializer(queryset,
+        Follow.objects.create(user=user, author=author)
+        serializer = FollowSerializer(author,
                                       context={'request': request})
         return Response(serializer.data, status=status.HTTP_201_CREATED)
 
