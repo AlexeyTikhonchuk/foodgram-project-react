@@ -56,7 +56,7 @@ class RecipeViewSet(viewsets.ModelViewSet):
                 'Рецепта нет в избранном, либо он уже удален.'
             )
         favorite = get_object_or_404(FavoriteRecipe,
-                                    user=user, recipe=recipe)
+                                     user=user, recipe=recipe)
         favorite.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
 
