@@ -28,7 +28,7 @@ class RecipeViewSet(viewsets.ModelViewSet):
             return CreateAndUpdateRecipeSerializer
         return RecipeSerializer
 
-    @action(detail=True, methods=('POST', 'DELETE'))
+    @action(detail=True, methods='POST')
     def favorite(self, request, pk=None):
         user = self.request.user
         recipe = get_object_or_404(Recipe, pk=pk)
@@ -60,7 +60,7 @@ class RecipeViewSet(viewsets.ModelViewSet):
         favorite.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
 
-    @action(detail=True, methods=('POST', 'DELETE'))
+    @action(detail=True, methods='POST')
     def shopping_cart(self, request, pk=None):
         user = self.request.user
         recipe = get_object_or_404(Recipe, pk=pk)
