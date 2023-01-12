@@ -6,7 +6,6 @@ from rest_framework.decorators import action
 from rest_framework.response import Response
 
 from users.models import Follow
-
 from ..utils.paginators import PageLimitPaginator
 from .serializers import FollowSerializer
 
@@ -30,6 +29,7 @@ class CustomUserViewSet(UserViewSet):
     def subscribe(self, request, id=None):
         user = request.user
         author = get_object_or_404(User, id=id)
+        serializer = self.get_serializer(author)
         if self.request.method == 'POST':
             if user == author:
                 return Response({'errors':
