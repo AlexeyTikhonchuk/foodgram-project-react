@@ -7,7 +7,7 @@ from rest_framework.response import Response
 
 from users.models import Follow
 from ..utils.paginators import PageLimitPaginator
-from .serializers import FollowSerializer, CustomUserSerializer
+from .serializers import CustomUserSerializer, FollowSerializer
 
 User = get_user_model()
 
