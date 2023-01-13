@@ -14,10 +14,12 @@ class RecipeAdmin(admin.ModelAdmin):
     readonly_fields = ('in_favorites',)
     list_display = (
         'name',
-        'author'
+        'author',
+        'in_favorites'
     )
     list_filter = ('name', 'author', 'tags')
     search_fields = ('name',)
+    filter_horizontal = ('tags',)
     empty_value_display = '-пусто-'
 
     def in_favorites(self, instance):
