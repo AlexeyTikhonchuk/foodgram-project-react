@@ -9,7 +9,7 @@
 
 Адрес ресурса: http://158.160.15.197/
 
-##Технологии: 
+## Технологии: 
 - Python
 - Django
 - Django REST Framework
