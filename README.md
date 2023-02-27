@@ -23,15 +23,25 @@ DB_PORT=5432
 SECRET_KEY='секретный ключ Django'
 ```
 Создать и запустить контейнеры Docker, выполнить команду в терминале из папки infra:
-`docker compose up -d`
+```
+docker-compose up -d
+```
 После успешной сборки выполнить миграции:
-`docker compose exec backend python manage.py migrate`
+```
+docker-compose exec backend python manage.py migrate
+```
 Создать суперпользователя:
-`docker compose exec backend python manage.py createsuperuser`
+```
+docker-compose exec backend python manage.py createsuperuser
+```
 Собрать статику:
-`docker compose exec backend python manage.py collectstatic --noinput`
+```
+docker compose exec backend python manage.py collectstatic --noinput
+```
 Наполнить базу данных содержимым из файла ingredients.json:
-`docker compose exec backend python manage.py loaddata ingredients.json`
+```
+docker compose exec backend python manage.py loaddata ingredients.json
+```
 
 После запуска проект будут доступен по адресу: http://localhost/
 
