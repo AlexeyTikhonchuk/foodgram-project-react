@@ -1,5 +1,5 @@
-|//![workflow](https://github.com/AlexeyTikhonchuk/foodgram-project-react/actions/workflows/foodgram_workflow.yml/badge.svg)
-
+[//]: # "![workflow](https://github.com/AlexeyTikhonchuk/foodgram-project-react/actions/workflows/foodgram_workflow.yml/badge.svg)"
+# Foodgram - продуктовый помощник
 ## Описание проекта
 Сервис позволяет пользователям публиковать рецепты,
 подписываться на публикации других пользователей, 
